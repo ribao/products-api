@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using ProductsWebAPI.Model;
+using ProductsWebAPI.Security;
 
 namespace ProductsTest.Integration;
 
@@ -25,7 +26,7 @@ public class ProductsApiTests
     {
         await using var application = new TestApplication();
         using var client =  application.CreateClient();
-        client.DefaultRequestHeaders.Add("UserId", "TestUser");
+        client.DefaultRequestHeaders.Add(FakeAuthHandler.ApiKey, "TestUser");
         var response = await client.GetAsync("api/products");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var result = await response.Content.ReadFromJsonAsync<Product[]>();
@@ -38,7 +39,7 @@ public class ProductsApiTests
     {
         await using var application = new TestApplication();
         using var client =  application.CreateClient();
-        client.DefaultRequestHeaders.Add("UserId", "TestUser");
+        client.DefaultRequestHeaders.Add(FakeAuthHandler.ApiKey, "TestUser");
         var response = await client.PostAsync("api/products", JsonContent.Create(new CreateProductCommand("Test Product", "Blue", 1)));
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var result = await response.Content.ReadFromJsonAsync<Product>();
@@ -55,7 +56,7 @@ public class ProductsApiTests
     {
         await using var application = new TestApplication();
         using var client =  application.CreateClient();
-        client.DefaultRequestHeaders.Add("UserId", "TestUser");
+        client.DefaultRequestHeaders.Add(FakeAuthHandler.ApiKey, "TestUser");
         var response = await client.PostAsync("api/products", JsonContent.Create(new CreateProductCommand("Test Product", "Blue", 0)));
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }

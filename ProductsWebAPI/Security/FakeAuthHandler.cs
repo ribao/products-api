@@ -5,14 +5,14 @@ using Microsoft.Extensions.Options;
 
 namespace ProductsWebAPI.Security;
 
-public class TestAuthHandler : AuthenticationHandler<TestAuthHandlerOptions>
+public class FakeAuthHandler : AuthenticationHandler<FakeAuthHandlerOptions>
 {
-    public const string UserId = "UserId";
+    public const string ApiKey = "ApiKey";
 
-    public const string AuthenticationScheme = "Test";
+    public const string AuthenticationScheme = "FakeAuthHandlerScheme";
     
-    public TestAuthHandler(
-        IOptionsMonitor<TestAuthHandlerOptions> options,
+    public FakeAuthHandler(
+        IOptionsMonitor<FakeAuthHandlerOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
         ISystemClock clock) : base(options, logger, encoder, clock)
@@ -22,7 +22,7 @@ public class TestAuthHandler : AuthenticationHandler<TestAuthHandlerOptions>
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Context.Request.Headers.TryGetValue(UserId, out var userId))
+        if (!Context.Request.Headers.TryGetValue(ApiKey, out var userId))
             return Task.FromResult(AuthenticateResult.Fail("Invalid user id"));
        
         var claims = new List<Claim>

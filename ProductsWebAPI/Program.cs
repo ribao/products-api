@@ -1,7 +1,10 @@
 using System.Reflection;
+using System.Text;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProductsWebAPI.Data;
 using ProductsWebAPI.Model;
@@ -19,39 +22,61 @@ builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
     {
         cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
         cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    }).Configure<TestAuthHandlerOptions>(options => options.DefaultUserId = "admin")
-    .AddAuthentication(TestAuthHandler.AuthenticationScheme)
-    .AddScheme<TestAuthHandlerOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
+    });
 
-builder.Services
-    .AddSwaggerGen(swagger =>
-    {
-        swagger.AddSecurityDefinition("TestAuthHandler", new OpenApiSecurityScheme
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<FakeAuthHandlerOptions>(options => options.DefaultUserId = "test")
+        .AddAuthentication(FakeAuthHandler.AuthenticationScheme)
+        .AddScheme<FakeAuthHandlerOptions, FakeAuthHandler>(FakeAuthHandler.AuthenticationScheme, options => { });
+
+    builder.Services
+        .AddSwaggerGen(swagger =>
         {
-            Name = "UserId",
-            Type = SecuritySchemeType.ApiKey,
-            Scheme = TestAuthHandler.AuthenticationScheme,
-            BearerFormat = "Test",
-            In = ParameterLocation.Header,
-            Description = "This is a test auth handler."
-        });
-        swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
+            swagger.AddSecurityDefinition("FakeAuthHandler", new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
+                Name = "ApiKey",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = FakeAuthHandler.AuthenticationScheme,
+                BearerFormat = "Test",
+                In = ParameterLocation.Header,
+                Description = "This is a test auth handler."
+            });
+            swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
-                    Reference = new OpenApiReference
+                    new OpenApiSecurityScheme
                     {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "TestAuthHandler"
-                    }
-                },
-                []
-            }
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "FakeAuthHandler"
+                        }
+                    },
+                    []
+                }
+            });
+        }).AddEndpointsApiExplorer();
+}
+else
+{
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = "ValidIssuer",
+                ValidAudience = "ValidAudience",
+                IssuerSigningKey = new SymmetricSecurityKey("IssuerSigningKey"u8.ToArray()),
+            };
         });
-    })
-    .AddEndpointsApiExplorer()
-    .AddAuthorization();
+}
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
