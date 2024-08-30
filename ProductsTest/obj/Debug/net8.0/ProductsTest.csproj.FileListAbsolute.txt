@@ -457,3 +457,4 @@
 /Users/alberto/RiderProjects/ProductsWebAPI/ProductsTest/obj/Debug/net8.0/ref/ProductsTest.dll
 /Users/alberto/RiderProjects/ProductsWebAPI/ProductsTest/bin/Debug/net8.0/MediatR.dll
 /Users/alberto/RiderProjects/ProductsWebAPI/ProductsTest/bin/Debug/net8.0/MediatR.Contracts.dll
+/Users/alberto/RiderProjects/ProductsWebAPI/ProductsTest/obj/Debug/net8.0/ProductsTest.sourcelink.json
