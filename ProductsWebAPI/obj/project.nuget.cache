@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "IJCND/8L13A=",
+  "dgSpecHash": "lZXyC6CP978=",
   "success": true,
   "projectFilePath": "/Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/ProductsWebAPI.csproj",
   "expectedPackageFiles": [
     "/Users/alberto/.nuget/packages/azure.core/1.35.0/azure.core.1.35.0.nupkg.sha512",
     "/Users/alberto/.nuget/packages/azure.identity/1.10.3/azure.identity.1.10.3.nupkg.sha512",
+    "/Users/alberto/.nuget/packages/fluentvalidation/11.9.2/fluentvalidation.11.9.2.nupkg.sha512",
+    "/Users/alberto/.nuget/packages/fluentvalidation.aspnetcore/11.3.0/fluentvalidation.aspnetcore.11.3.0.nupkg.sha512",
+    "/Users/alberto/.nuget/packages/fluentvalidation.dependencyinjectionextensions/11.9.2/fluentvalidation.dependencyinjectionextensions.11.9.2.nupkg.sha512",
     "/Users/alberto/.nuget/packages/mediatr/12.4.0/mediatr.12.4.0.nupkg.sha512",
     "/Users/alberto/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
     "/Users/alberto/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.8/microsoft.aspnetcore.authentication.jwtbearer.8.0.8.nupkg.sha512",

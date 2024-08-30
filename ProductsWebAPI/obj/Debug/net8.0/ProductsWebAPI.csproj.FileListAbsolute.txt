@@ -72,3 +72,7 @@
 /Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/obj/Debug/net8.0/ref/ProductsWebAPI.dll
 /Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/bin/Debug/net8.0/MediatR.dll
 /Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/bin/Debug/net8.0/MediatR.Contracts.dll
+/Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/obj/Debug/net8.0/ProductsWebAPI.sourcelink.json
+/Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/bin/Debug/net8.0/FluentValidation.dll
+/Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/bin/Debug/net8.0/FluentValidation.AspNetCore.dll
+/Users/alberto/RiderProjects/ProductsWebAPI/ProductsWebAPI/bin/Debug/net8.0/FluentValidation.DependencyInjectionExtensions.dll

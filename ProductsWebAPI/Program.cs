@@ -1,10 +1,12 @@
 using System.Reflection;
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ProductsWebAPI.Data;
 using ProductsWebAPI.Model;
 using ProductsWebAPI.Security;
+using ProductsWebAPI.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ProductsDbContext>(options =>
     options.UseInMemoryDatabase("ProductsDb"));
 
-builder.Services.AddMediatR(cfg=>cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
-
-builder.Services.Configure<TestAuthHandlerOptions>(options => options.DefaultUserId = "admin");
-
-builder.Services.AddAuthentication(TestAuthHandler.AuthenticationScheme)
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+    .AddMediatR(cfg =>
+    {
+        cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
+        cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    }).Configure<TestAuthHandlerOptions>(options => options.DefaultUserId = "admin")
+    .AddAuthentication(TestAuthHandler.AuthenticationScheme)
     .AddScheme<TestAuthHandlerOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
 
 builder.Services
@@ -29,7 +33,7 @@ builder.Services
             Scheme = TestAuthHandler.AuthenticationScheme,
             BearerFormat = "Test",
             In = ParameterLocation.Header,
-            Description = "This is a test auth handler.",
+            Description = "This is a test auth handler."
         });
         swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
@@ -89,14 +93,16 @@ app.MapGet("/api/products/color/{color}", async (string color, IMediator mediato
 {
     var products = await mediator.Send(new GetProductsByColorQuery(color));
     return Results.Ok(products);
-}).AllowAnonymous();
+}).RequireAuthorization();
 
 // Get a product by ID
 app.MapGet("/api/products/{id}", async (int id, IMediator mediator) =>
 {
     var product = await mediator.Send(new GetProductByIdQuery(id));
     return product == null ? Results.NotFound() : Results.Ok(product);
-}).AllowAnonymous();
+}).RequireAuthorization();
+
+app.UseMiddleware<ValidationExceptionHandlingMiddleware>();
 
 app.Run();
 
@@ -104,18 +110,22 @@ app.Run();
 void SeedData(ProductsDbContext dbContext)
 {
     if (dbContext.Products.Any()) return;
-    var products = new List<Product>
-    {
-        new() { Name = "Red iPhone", Color = "Red", Price = 1100 },
-        new() { Name = "Blue iPhone", Color = "Blue", Price = 1200 },
-        new() { Name = "Black iPhone", Color = "Black", Price = 1300 },
-    };
+    List<Product> products =
+    [
+        new Product { Name = "Red iPhone", Color = "Red", Price = 1100 },
+        new Product { Name = "Blue iPhone", Color = "Blue", Price = 1200 },
+        new Product { Name = "Black iPhone", Color = "Black", Price = 1300 }
+    ];
 
     dbContext.Products.AddRange(products);
     dbContext.SaveChanges();
 }
 
 
-
 // Make the implicit Program class public so test projects can access it
-public partial class Program { }
+namespace ProductsWebAPI
+{
+    public partial class Program
+    {
+    }
+}

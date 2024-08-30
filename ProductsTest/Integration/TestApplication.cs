@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
+using ProductsWebAPI;
 
 namespace ProductsTest.Integration;
 

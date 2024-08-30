@@ -31,6 +31,34 @@ public class ProductsApiTests
         var result = await response.Content.ReadFromJsonAsync<Product[]>();
         result.Should().HaveCount(3);
     }
+    
+    
+    [Fact]
+    public async Task When_Authorised_AddProduct()
+    {
+        await using var application = new TestApplication();
+        using var client =  application.CreateClient();
+        client.DefaultRequestHeaders.Add("UserId", "TestUser");
+        var response = await client.PostAsync("api/products", JsonContent.Create(new CreateProductCommand("Test Product", "Blue", 1)));
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var result = await response.Content.ReadFromJsonAsync<Product>();
+        result.Name.Should().Be("Test Product");
+       
+        var allResponse = await client.GetAsync("api/products");
+        allResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var allResult = await allResponse.Content.ReadFromJsonAsync<Product[]>();
+        allResult.Should().HaveCount(4);
+    }
+    
+    [Fact]
+    public async Task ValidateNewProduct_ReturnsBadRequest()
+    {
+        await using var application = new TestApplication();
+        using var client =  application.CreateClient();
+        client.DefaultRequestHeaders.Add("UserId", "TestUser");
+        var response = await client.PostAsync("api/products", JsonContent.Create(new CreateProductCommand("Test Product", "Blue", 0)));
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
 
     [Fact]
     public async Task When_NotAuthorised_ReturnsUnauthorizedStatus()
